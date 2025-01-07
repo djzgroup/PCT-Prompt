@@ -1,0 +1,70 @@
+optimizer : {
+  type: Adamw,
+  kwargs: {
+  learning_rate: 0.0005,
+#  learning_rate: 0.00001,
+  weight_decay : 0.5,
+  momentum: 0.9,
+  step_size: 20,
+  decay_rate: 5e-2,
+}}
+
+scheduler: {
+  type: CosLR,
+  kwargs: {
+    epochs: 300,
+    initial_epochs : 3,
+}}
+
+dataset : {
+    NAME: shapenetpart ,
+    DATA_PATH: '/data/shapenetcore_partanno_segmentation_benchmark_v0_normal',
+    N_POINTS: 8192,
+    NUM_CATEGORY: 40,
+    USE_NORMALS: FALSE,
+ }
+NAME: PCTAdapter-partseg,
+transformer_config: {
+  group_size: 32,
+  encoder_dims: 256,
+  num_group: 128,
+  trans_dim: 384,
+  depth: 12,
+  drop_path_rate: 0.1,
+  cls_dim: 512,
+  num_heads: 6,
+}
+adapter_config : {
+  init_values: 0.1,
+  ffn_ratio: 0.25,
+  drop: 0.25,
+  drop_path: 0.25,
+  with_ffn: Ture,
+  interaction_indexes: [[0, 1],[2, 3], [4, 5], [6, 7], [8, 9],[10, 11]],
+  alpha: 1000,
+  beta: 100,
+}
+part_segmentation: {
+#  channel_list: [64, 128, 256, 512],
+  channel_list: [384, 384, 384,384],
+#  de_inchannel_list: [1536, 768, 384, 192],
+  de_inchannel_list: [768, 768, 768, 384],
+#  de_outchannel_list: [512, 256, 128, 128],
+  de_outchannel_list: [384, 384, 384, 384],
+  classes_str: ['aero', 'bag', 'cap', 'car', 'chair', 'ear', 'guitar',
+  'knife', 'lamp', 'lapt', 'moto', 'mug', 'Pistol', 'rock', 'stake', 'table']
+}
+version: 'new'
+add_pct_feature: True
+
+#pretrain: '../pretrain_pth/Point-BERT.pth'
+pretrain: '/home/PCT-Promptpro/PCT-Prompt/pretrain_pth/Point-BERT.pth'
+#pretrain: '../pretrain_pth/ACT.pth'
+num_points: 2048
+batch_size : 12
+test_batch_size: 8
+step_per_update : 1
+max_epoch : 400
+class_num : 16
+num_part: 50
+consider_metric: CDL1

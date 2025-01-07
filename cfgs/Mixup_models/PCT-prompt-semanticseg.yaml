@@ -1,0 +1,80 @@
+optimizer : {
+  type: AdamW,
+  kwargs: {
+  learning_rate: 0.00005,
+  weight_decay : 0.8,
+  momentum: 0.9,
+  step_size: 20,
+  decay_rate: 5e-3,
+}}
+
+scheduler: {
+  type: CosLR,
+  kwargs: {
+    epochs: 300,
+    initial_epochs : 3,
+}}
+
+dataset : {
+    NAME: S3DIS,
+#    DATA_PATH: '../sem_segmentation/data/indoor3d_sem_seg_hdf5_data',
+#    DATA_PATH: '../sem_segmentation_new/data/s3disfull/s3disfull/raw',
+    DATA_PATH: '/data/s3disfull/s3disfull/raw',
+    N_POINTS: 4096,
+    NUM_CATEGORY: 40,
+    USE_NORMALS: FALSE,
+ }
+NAME: PCTAdapter-partseg,
+transformer_config: {
+  group_size: 64,
+  encoder_dims: 256,
+  num_group: 256,
+  trans_dim: 384,
+  depth: 12,
+  drop_path_rate: 0.1,
+  cls_dim: 512,
+  num_heads: 6,
+}
+adapter_config : {
+  radius: [0.1, 0.2, 0.4, 0.8],
+  init_values: 0.0,
+  ffn_ratio: 0.25,
+  drop: 0.25,
+  drop_path: 0.25,
+  with_ffn: False,
+  interaction_indexes: [[0, 1],[2, 3], [4, 5], [6, 7], [8, 9],[10, 11]],
+#  interaction_indexes: [[0,11]],
+  alpha: 1000,  beta: 100,
+  invresmlp_layer: [ 2, 3, 3, 2],
+  expansion: 4,
+  use_res: True
+}
+part_segmentation: {
+#  channel_list: [576, 576, 576, 576],
+  channel_list: [384, 384, 384,384],
+#  de_inchannel_list: [1152, 1152, 1152, 576],
+  de_inchannel_list: [768, 768, 768, 384],
+#  de_outchannel_list: [576, 576, 576, 576],
+  de_outchannel_list: [384, 384, 384, 384],
+  classes_str: ['aero', 'bag', 'cap', 'car', 'chair', 'ear', 'guitar',
+  'knife', 'lamp', 'lapt', 'moto', 'mug', 'Pistol', 'rock', 'stake', 'table']
+}
+version: 'new'
+add_pct_feature: True
+
+#pretrain: 'C:\Users\byz\Downloads\base.pth'
+#pretrain: 'C:\Users\byz\Downloads\ckpt-last-vitb-m0.8-d384-dec2.pth'
+pretrain: '/home/PCT-Promptpro/PCT-Prompt/pretrain_pth/Point-BERT.pth'
+#pretrain: '../pretrain_pth/Point-BERT.pth'
+#pretrain: '../pretrain_pth/ACT.pth'
+num_points: 4096
+batch_size : 1
+test_batch_size: 1
+step_per_update : 1
+max_epoch : 1500
+class_num : 13
+num_part: 50
+consider_metric: CDL1
+test_area: 5
+train_area: 1
+label_smoothing: 0.2
